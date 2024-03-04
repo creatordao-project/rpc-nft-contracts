@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 error NotAuthorized();
-error AleadyMinted();
+error AlreadyMinted();
 
 contract ReadyPlayerClub is ERC721, Ownable {
     /**
@@ -25,6 +26,7 @@ contract ReadyPlayerClub is ERC721, Ownable {
      */
     mapping(address => bool) public minted;
 
+    event UpdateBaseURI(string _uri);
     event UpdateWhitelistMerkleTreeRoot(bytes32 _root);
 
     constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
@@ -35,7 +37,7 @@ contract ReadyPlayerClub is ERC721, Ownable {
      * @dev mint NFT
      * @param merkleProof_ merkle proof
      */
-    function mint(bytes32[] calldata merkleProof_) public returns (uint256) {
+    function mint(bytes32[] calldata merkleProof_) public nonReentrant returns (uint256) {
         if (isValidProof(_msgSender(), merkleProof_) == false) revert NotAuthorized();
         if (minted[_msgSender()] == true) revert AleadyMinted();
         minted[_msgSender()] = true;
@@ -50,15 +52,21 @@ contract ReadyPlayerClub is ERC721, Ownable {
      * @param _uri new URI
      */
     function setBaseURI(string memory _uri) external onlyOwner {
-        _baseUri = _uri;
+        if(_uri != _baseUri) {
+            _baseUri = _uri;
+
+            emit UpdateBaseURI(_uri);
+        }
     }
     /**
      * @dev update whitelist
      */
     function updateWhitelisteMerkleTree(bytes32 _root) external onlyOwner {
-        _whitelistMerkleRoot = _root;
+        if(_whitelistMerkleRoot != _root) {
+            _whitelistMerkleRoot = _root;
 
-        emit UpdateWhitelistMerkleTreeRoot(_root);
+            emit UpdateWhitelistMerkleTreeRoot(_root);
+        }
     }
 
     //--------------------------- INTERNAL FUNCTION ----------------------------------------
