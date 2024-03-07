@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 error NotAuthorized();
 error AlreadyMinted();
+error NotMintPeriod();
 
-contract ReadyPlayerClub is ERC721, Ownable {
+contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     /**
      * @dev token metadata link
      */
@@ -22,6 +23,14 @@ contract ReadyPlayerClub is ERC721, Ownable {
      */
     bytes32 internal _whitelistMerkleRoot;
     /**
+     * @dev mint start-time
+     */
+    uint256 constant public START_MINTABLE_TIME = 0;
+    /**
+     * @dev mint end-time
+     */
+    uint256 public END_MINTABLE_TIME;
+    /**
      * @dev prevent duplicate mint
      */
     mapping(address => bool) public minted;
@@ -31,20 +40,24 @@ contract ReadyPlayerClub is ERC721, Ownable {
 
     constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
         _whitelistMerkleRoot = merkleRoot_;
+        END_MINTABLE_TIME = block.timestamp + 6048000;
     }
 
     /**
      * @dev mint NFT
      * @param merkleProof_ merkle proof
      */
-    function mint(bytes32[] calldata merkleProof_) public nonReentrant returns (uint256) {
-        if (isValidProof(_msgSender(), merkleProof_) == false) revert NotAuthorized();
-        if (minted[_msgSender()] == true) revert AleadyMinted();
+    function claim(uint256 amount_, bytes32[] calldata merkleProof_) public nonReentrant returns (bool) {
+        if (isValidProof(_msgSender(), amount_, merkleProof_) == false) revert NotAuthorized();
+        if(block.timestamp < START_MINTABLE_TIME || END_MINTABLE_TIME < block.timestamp) revert NotMintPeriod();
+        if (minted[_msgSender()] == true) revert AlreadyMinted();
         minted[_msgSender()] = true;
-        uint256 tokenId = _nextTokenId++;
-         _mint(_msgSender(), tokenId);
+        for(uint i=0; i<amount_; i++) {
+            uint256 tokenId = _nextTokenId++;
+            _mint(_msgSender(), tokenId);
+        }
 
-        return tokenId;
+        return true;
     }
 
     /**
@@ -52,10 +65,18 @@ contract ReadyPlayerClub is ERC721, Ownable {
      * @param _uri new URI
      */
     function setBaseURI(string memory _uri) external onlyOwner {
-        if(_uri != _baseUri) {
-            _baseUri = _uri;
+        _baseUri = _uri;
 
-            emit UpdateBaseURI(_uri);
+        emit UpdateBaseURI(_uri);
+    }
+
+    /**
+     * @dev setting up mintable end-time
+     * @param _newTime new end-time
+     */
+    function setMintableEndTime(uint256 _newTime) external onlyOwner {
+        if(_newTime != END_MINTABLE_TIME) {
+            END_MINTABLE_TIME = _newTime;
         }
     }
     /**
@@ -77,9 +98,10 @@ contract ReadyPlayerClub is ERC721, Ownable {
     //--------------------------- VIEW FUNCTION ----------------------------------------
     function isValidProof(
         address user_,
+        uint256 amount_,
         bytes32[] calldata merkleProof_
     ) public view returns (bool) {
-        bytes32 leaf = keccak256(abi.encodePacked(user_));
+        bytes32 leaf = keccak256(abi.encodePacked(user_, amount_));
         return
             MerkleProof.verify(merkleProof_, _whitelistMerkleRoot, leaf);
     }
