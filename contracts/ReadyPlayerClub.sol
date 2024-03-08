@@ -7,20 +7,30 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 error NotAuthorized();
 error AlreadyMinted();
+error NotMintTime();
 
-contract ReadyPlayerClub is ERC721, Ownable {
+contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     /**
      * @dev token metadata link
      */
     string internal _baseUri;
-        /**
-     * @dev next mintable token id
+    /**
+     * @dev next mint-able token id
      */
     uint256 internal _nextTokenId;
+    /**
+     * @dev mint start time
+     */
+    uint256 constant MINT_START_TIME = 0;
+    /**
+     * @dev mint end time
+     */
+    uint256 public MINT_END_TIME;
     /**
      * @dev record whitelisted user
      */
     bytes32 internal _whitelistMerkleRoot;
+    
     /**
      * @dev prevent duplicate mint
      */
@@ -31,6 +41,7 @@ contract ReadyPlayerClub is ERC721, Ownable {
 
     constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
         _whitelistMerkleRoot = merkleRoot_;
+        MINT_END_TIME = block.timestamp + 7 days;
     }
 
     /**
@@ -39,7 +50,7 @@ contract ReadyPlayerClub is ERC721, Ownable {
      */
     function mint(bytes32[] calldata merkleProof_) public nonReentrant returns (uint256) {
         if (isValidProof(_msgSender(), merkleProof_) == false) revert NotAuthorized();
-        if (minted[_msgSender()] == true) revert AleadyMinted();
+        if (minted[_msgSender()] == true) revert AlreadyMinted();
         minted[_msgSender()] = true;
         uint256 tokenId = _nextTokenId++;
          _mint(_msgSender(), tokenId);
@@ -49,23 +60,31 @@ contract ReadyPlayerClub is ERC721, Ownable {
 
     /**
      * @dev setting up base URI
-     * @param _uri new URI
+     * @param uri_ new URI
      */
-    function setBaseURI(string memory _uri) external onlyOwner {
-        if(_uri != _baseUri) {
-            _baseUri = _uri;
+    function setBaseURI(string memory uri_) external onlyOwner {
+        _baseUri = uri_;
 
-            emit UpdateBaseURI(_uri);
-        }
+        emit UpdateBaseURI(uri_);
     }
+
+    /**
+     * @dev setting up mint end time
+     * @param time_ new end time
+     */
+    function setMintEndTime(uint256 time_) external onlyOwner {
+        if(time_ < MINT_START_TIME) revert();
+        MINT_END_TIME = time_;
+    }
+
     /**
      * @dev update whitelist
      */
-    function updateWhitelisteMerkleTree(bytes32 _root) external onlyOwner {
-        if(_whitelistMerkleRoot != _root) {
-            _whitelistMerkleRoot = _root;
+    function updateWhitelisteMerkleTree(bytes32 root_) external onlyOwner {
+        if(_whitelistMerkleRoot != root_) {
+            _whitelistMerkleRoot = root_;
 
-            emit UpdateWhitelistMerkleTreeRoot(_root);
+            emit UpdateWhitelistMerkleTreeRoot(root_);
         }
     }
 
