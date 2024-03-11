@@ -21,7 +21,7 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     /**
      * @dev mint start time
      */
-    uint256 constant MINT_START_TIME = 0;
+    uint256 public MINT_START_TIME;
     /**
      * @dev mint end time
      */
@@ -30,7 +30,7 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
      * @dev record whitelisted user
      */
     bytes32 internal _whitelistMerkleRoot;
-    
+
     /**
      * @dev prevent duplicate mint
      */
@@ -39,8 +39,14 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     event UpdateBaseURI(string _uri);
     event UpdateWhitelistMerkleTreeRoot(bytes32 _root);
 
-    constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        bytes32 merkleRoot_,
+        address initialOwner_
+    ) ERC721(name_, symbol_) Ownable(initialOwner_) {
         _whitelistMerkleRoot = merkleRoot_;
+        MINT_START_TIME = block.timestamp;
         MINT_END_TIME = block.timestamp + 30 days;
     }
 
@@ -48,13 +54,18 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
      * @dev mint NFT
      * @param merkleProof_ merkle proof
      */
-    function mint(bytes32[] calldata merkleProof_) public nonReentrant returns (uint256) {
-        if (isValidProof(_msgSender(), merkleProof_) == false) revert NotAuthorized();
+    function mint(
+        bytes32[] calldata merkleProof_
+    ) public nonReentrant returns (uint256) {
+        if (isValidProof(_msgSender(), merkleProof_) == false)
+            revert NotAuthorized();
         if (minted[_msgSender()] == true) revert AlreadyMinted();
-        if (block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp) revert NotMintTime();
+        if (
+            block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp
+        ) revert NotMintTime();
 
         uint256 tokenId = _nextTokenId++;
-         _mint(_msgSender(), tokenId);
+        _mint(_msgSender(), tokenId);
 
         minted[_msgSender()] = true;
         return tokenId;
@@ -71,11 +82,19 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     }
 
     /**
+     * @dev setting up mint start time
+     * @param time_ new start time
+     */
+    function setMintStartTime(uint256 time_) external onlyOwner {
+        MINT_START_TIME = time_;
+    }
+
+    /**
      * @dev setting up mint end time
      * @param time_ new end time
      */
     function setMintEndTime(uint256 time_) external onlyOwner {
-        if(time_ < MINT_START_TIME) revert();
+        if (time_ < MINT_START_TIME) revert();
         MINT_END_TIME = time_;
     }
 
@@ -83,7 +102,7 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
      * @dev update whitelist
      */
     function updateWhitelisteMerkleTree(bytes32 root_) external onlyOwner {
-        if(_whitelistMerkleRoot != root_) {
+        if (_whitelistMerkleRoot != root_) {
             _whitelistMerkleRoot = root_;
 
             emit UpdateWhitelistMerkleTreeRoot(root_);
@@ -101,8 +120,7 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
         bytes32[] calldata merkleProof_
     ) public view returns (bool) {
         bytes32 leaf = keccak256(abi.encodePacked(user_));
-        return
-            MerkleProof.verify(merkleProof_, _whitelistMerkleRoot, leaf);
+        return MerkleProof.verify(merkleProof_, _whitelistMerkleRoot, leaf);
     }
 
     function totalSupply() public view returns (uint256) {
