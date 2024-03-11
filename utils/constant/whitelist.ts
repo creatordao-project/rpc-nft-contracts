@@ -6803,5 +6803,9 @@ export const whitelist = [
     {
         "address": "0x54e17ad2c472ec16c39e5e25d8a0bfcc33d815e0",
         "amount": "1"
+    },
+    {
+        "address": "0x7227f02831D544A68babBd225BF1C55b2a7F05a3",
+        "amount": "1"
     }
 ]

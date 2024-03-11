@@ -41,7 +41,7 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
 
     constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
         _whitelistMerkleRoot = merkleRoot_;
-        MINT_END_TIME = block.timestamp + 7 days;
+        MINT_END_TIME = block.timestamp + 30 days;
     }
 
     /**
@@ -51,10 +51,12 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     function mint(bytes32[] calldata merkleProof_) public nonReentrant returns (uint256) {
         if (isValidProof(_msgSender(), merkleProof_) == false) revert NotAuthorized();
         if (minted[_msgSender()] == true) revert AlreadyMinted();
-        minted[_msgSender()] = true;
+        if (block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp) revert NotMintTime();
+
         uint256 tokenId = _nextTokenId++;
          _mint(_msgSender(), tokenId);
 
+        minted[_msgSender()] = true;
         return tokenId;
     }
 
