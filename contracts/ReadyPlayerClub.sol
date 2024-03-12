@@ -72,6 +72,14 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     }
 
     /**
+     * @dev Burn nft
+     * @param tokenId_ nft token id
+     */
+    function burn(uint256 tokenId_) public {
+        _update(address(0), tokenId_, _msgSender());
+    }
+
+    /**
      * @dev setting up base URI
      * @param uri_ new URI
      */
