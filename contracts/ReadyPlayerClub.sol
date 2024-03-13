@@ -14,17 +14,17 @@ contract ReadyPlayerClub is ERC721A, Ownable {
      */
     string internal _baseUri;
     /**
-     * @dev record whitelisted user
-     */
-    bytes32 internal _whitelistMerkleRoot;
-    /**
-     * @dev mint start-time
+     * @dev mint start time
      */
     uint256 public MINT_START_TIME;
     /**
-     * @dev mint end-time
+     * @dev mint end time
      */
     uint256 public MINT_END_TIME;
+    /**
+     * @dev record whitelisted user
+     */
+    bytes32 internal _whitelistMerkleRoot;
     /**
      * @dev prevent duplicate mint
      */
@@ -65,41 +65,49 @@ contract ReadyPlayerClub is ERC721A, Ownable {
     }
 
     /**
-     * @dev setting up base URI
-     * @param _uri new URI
+     * @dev burn NFT
+     * @param tokenId_ burn tokenId
      */
-    function setBaseURI(string memory _uri) external onlyOwner {
-        _baseUri = _uri;
+    function burn(uint256 tokenId_) public {
+        _burn(tokenId_, true);
+    }
 
-        emit UpdateBaseURI(_uri);
+    /**
+     * @dev setting up baseURI
+     * @param uri_ baseURI
+     */
+    function setBaseURI(string memory uri_) external onlyOwner {
+        _baseUri = uri_;
+
+        emit UpdateBaseURI(uri_);
     }
 
     /**
      * @dev setting up mintable end-time
-     * @param _newTime new end-time
+     * @param newTime_ new end-time
      */
-    function setMintStartTime(uint256 _newTime) external onlyOwner {
-        MINT_START_TIME = _newTime;
+    function setMintStartTime(uint256 newTime_) external onlyOwner {
+        MINT_START_TIME = newTime_;
     }
 
     /**
      * @dev setting up mintable end-time
-     * @param _newTime new end-time
+     * @param newTime_ new end-time
      */
-    function setMintEndTime(uint256 _newTime) external onlyOwner {
-        if (_newTime < MINT_START_TIME) revert();
+    function setMintEndTime(uint256 newTime_) external onlyOwner {
+        if (newTime_ < MINT_START_TIME) revert();
 
-        MINT_END_TIME = _newTime;
+        MINT_END_TIME = newTime_;
     }
 
     /**
      * @dev update whitelist
      */
-    function updateWhitelisteMerkleTree(bytes32 _root) external onlyOwner {
-        if (_whitelistMerkleRoot != _root) {
-            _whitelistMerkleRoot = _root;
+    function updateWhitelisteMerkleTree(bytes32 root_) external onlyOwner {
+        if (_whitelistMerkleRoot != root_) {
+            _whitelistMerkleRoot = root_;
 
-            emit UpdateWhitelistMerkleTreeRoot(_root);
+            emit UpdateWhitelistMerkleTreeRoot(root_);
         }
     }
 
