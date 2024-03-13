@@ -2,6 +2,7 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "erc721a": "^4.3.0",
     "hardhat": "^2.20.1"
   },
   "dependencies": {

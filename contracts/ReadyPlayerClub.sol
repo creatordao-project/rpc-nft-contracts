@@ -1,23 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "erc721a/contracts/ERC721A.sol";
 
 error NotAuthorized();
 error AlreadyMinted();
 error NotMintPeriod();
 
-contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
+contract ReadyPlayerClub is ERC721A, Ownable {
     /**
      * @dev token metadata link
      */
     string internal _baseUri;
-        /**
-     * @dev next mintable token id
-     */
-    uint256 internal _nextTokenId;
     /**
      * @dev record whitelisted user
      */
@@ -25,11 +20,11 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     /**
      * @dev mint start-time
      */
-    uint256 constant public START_MINTABLE_TIME = 0;
+    uint256 public MINT_START_TIME;
     /**
      * @dev mint end-time
      */
-    uint256 public END_MINTABLE_TIME;
+    uint256 public MINT_END_TIME;
     /**
      * @dev prevent duplicate mint
      */
@@ -38,24 +33,33 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
     event UpdateBaseURI(string _uri);
     event UpdateWhitelistMerkleTreeRoot(bytes32 _root);
 
-    constructor(string memory name_, string memory symbol_, bytes32 merkleRoot_, address initialOwner_) ERC721(name_, symbol_) Ownable(initialOwner_){
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        bytes32 merkleRoot_,
+        address initialOwner_
+    ) ERC721A(name_, symbol_) Ownable(initialOwner_) {
         _whitelistMerkleRoot = merkleRoot_;
-        END_MINTABLE_TIME = block.timestamp + 6048000;
+        MINT_START_TIME = block.timestamp;
+        MINT_END_TIME = block.timestamp + 30 days;
     }
 
     /**
      * @dev mint NFT
      * @param merkleProof_ merkle proof
      */
-    function claim(uint256 amount_, bytes32[] calldata merkleProof_) public nonReentrant returns (bool) {
-        if (isValidProof(_msgSender(), amount_, merkleProof_) == false) revert NotAuthorized();
-        if(block.timestamp < START_MINTABLE_TIME || END_MINTABLE_TIME < block.timestamp) revert NotMintPeriod();
+    function mint(
+        uint256 amount_,
+        bytes32[] calldata merkleProof_
+    ) public returns (bool) {
+        if (isValidProof(_msgSender(), amount_, merkleProof_) == false)
+            revert NotAuthorized();
+        if (
+            block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp
+        ) revert NotMintPeriod();
         if (minted[_msgSender()] == true) revert AlreadyMinted();
         minted[_msgSender()] = true;
-        for(uint i=0; i<amount_; i++) {
-            uint256 tokenId = _nextTokenId++;
-            _mint(_msgSender(), tokenId);
-        }
+        _mint(_msgSender(), amount_);
 
         return true;
     }
@@ -74,16 +78,25 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
      * @dev setting up mintable end-time
      * @param _newTime new end-time
      */
-    function setMintableEndTime(uint256 _newTime) external onlyOwner {
-        if(_newTime != END_MINTABLE_TIME) {
-            END_MINTABLE_TIME = _newTime;
-        }
+    function setMintStartTime(uint256 _newTime) external onlyOwner {
+        MINT_START_TIME = _newTime;
     }
+
+    /**
+     * @dev setting up mintable end-time
+     * @param _newTime new end-time
+     */
+    function setMintEndTime(uint256 _newTime) external onlyOwner {
+        if (_newTime < MINT_START_TIME) revert();
+
+        MINT_END_TIME = _newTime;
+    }
+
     /**
      * @dev update whitelist
      */
     function updateWhitelisteMerkleTree(bytes32 _root) external onlyOwner {
-        if(_whitelistMerkleRoot != _root) {
+        if (_whitelistMerkleRoot != _root) {
             _whitelistMerkleRoot = _root;
 
             emit UpdateWhitelistMerkleTreeRoot(_root);
@@ -102,11 +115,6 @@ contract ReadyPlayerClub is ERC721, Ownable, ReentrancyGuard {
         bytes32[] calldata merkleProof_
     ) public view returns (bool) {
         bytes32 leaf = keccak256(abi.encodePacked(user_, amount_));
-        return
-            MerkleProof.verify(merkleProof_, _whitelistMerkleRoot, leaf);
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return _nextTokenId;
+        return MerkleProof.verify(merkleProof_, _whitelistMerkleRoot, leaf);
     }
 }

@@ -14,9 +14,10 @@ describe("Mint", async function () {
     await contract.waitForDeployment();
     const deployedAddress = await contract.getAddress();
     const proof = merkleTree.getHexProof(leafNodes[1]);
-    const tx = await ReadyPlayerClub__factory.connect(deployedAddress, minter).claim(2, proof);
+    const tx = await ReadyPlayerClub__factory.connect(deployedAddress, minter).mint(2, proof);
     await tx.wait();
     const tx_receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+    console.log("Gas used:", tx_receipt?.gasUsed)
     expect(tx_receipt?.status).to.equal(1);
 
     const tatalSupply = await ReadyPlayerClub__factory.connect(deployedAddress, minter).totalSupply()
