@@ -11,7 +11,7 @@ describe("Mint", async function () {
         const leafNodes = [...whitelist, minter].map(user => ethers.keccak256(ethers.solidityPacked(['address', 'uint256'], [user.address, "2"])));
         const merkleTree = new MerkleTree(leafNodes, ethers.keccak256, { sortPairs: true });
         const rootHash = merkleTree.getRoot();
-        const contract = await factory.deploy('test', 'test', rootHash, deployer?.address);
+        const contract = await factory.deploy('test', 'test', rootHash, deployer?.address, deployer?.address);
         await contract.waitForDeployment();
         const deployedAddress = await contract.getAddress();
         const proof = merkleTree.getHexProof(leafNodes[leafNodes.length - 1]);

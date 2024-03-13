@@ -7,6 +7,7 @@ import "erc721a/contracts/ERC721A.sol";
 error NotAuthorized();
 error AlreadyMinted();
 error NotMintPeriod();
+error AllMinted();
 
 contract ReadyPlayerClub is ERC721A, Ownable {
     /**
@@ -21,6 +22,10 @@ contract ReadyPlayerClub is ERC721A, Ownable {
      * @dev mint end time
      */
     uint256 public MINT_END_TIME;
+    /**
+     * @dev total supply
+     */
+    uint256 constant MAX_TOTAL_SUPPLY = 200;
     /**
      * @dev record whitelisted user
      */
@@ -37,11 +42,14 @@ contract ReadyPlayerClub is ERC721A, Ownable {
         string memory name_,
         string memory symbol_,
         bytes32 merkleRoot_,
-        address initialOwner_
+        address initialOwner_,
+        address treasure_
     ) ERC721A(name_, symbol_) Ownable(initialOwner_) {
         _whitelistMerkleRoot = merkleRoot_;
         MINT_START_TIME = block.timestamp;
         MINT_END_TIME = block.timestamp + 30 days;
+
+        _mint(treasure_, 20);
     }
 
     /**
@@ -58,8 +66,14 @@ contract ReadyPlayerClub is ERC721A, Ownable {
             block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp
         ) revert NotMintPeriod();
         if (minted[_msgSender()] == true) revert AlreadyMinted();
+        if (MAX_TOTAL_SUPPLY == totalSupply()) revert AllMinted();
+
         minted[_msgSender()] = true;
-        _mint(_msgSender(), amount_);
+        if (MAX_TOTAL_SUPPLY <= totalSupply() + amount_) {
+            _mint(_msgSender(), MAX_TOTAL_SUPPLY - totalSupply());
+        } else {
+            _mint(_msgSender(), amount_);
+        }
 
         return true;
     }
