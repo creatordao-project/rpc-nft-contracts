@@ -41,15 +41,12 @@ contract ReadyPlayerClub is ERC721A, Ownable {
     constructor(
         string memory name_,
         string memory symbol_,
-        bytes32 merkleRoot_,
-        address initialOwner_,
-        address treasure_
+        bytes32 merkleRoot_, 
+        address initialOwner_
     ) ERC721A(name_, symbol_) Ownable(initialOwner_) {
         _whitelistMerkleRoot = merkleRoot_;
         MINT_START_TIME = block.timestamp;
         MINT_END_TIME = block.timestamp + 30 days;
-
-        _mint(treasure_, 20);
     }
 
     /**

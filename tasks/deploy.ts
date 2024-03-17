@@ -9,9 +9,8 @@ task(`deploy`)
     .addParam(`symbol`)
     .addParam(`merkle`)
     .addOptionalParam(`owner`)
-    .addOptionalParam(`treasure`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
-        const { name, symbol, merkle, owner, treasure } = taskArguments;
+        const { name, symbol, merkle, owner } = taskArguments;
         const privateKey = getPrivateKey();
         const rpcProviderUrl = getProviderRpcUrl(hre.network.name);
 
@@ -20,7 +19,7 @@ task(`deploy`)
         const deployer = wallet.connect(provider);
 
         const factory: ReadyPlayerClub__factory = await hre.ethers.getContractFactory('ReadyPlayerClub') as ReadyPlayerClub__factory;
-        const contract = await factory.deploy(name, symbol, merkle, owner ?? deployer?.address, treasure ?? deployer?.address);
+        const contract = await factory.deploy(name, symbol, merkle, owner ?? deployer?.address);
         await contract.waitForDeployment()
         const address = await contract.getAddress()
 
