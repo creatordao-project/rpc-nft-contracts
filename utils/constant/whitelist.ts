@@ -113,11 +113,11 @@ export const whitelist = [
     },
     {
         "address": "0x9818489F45eB022aC90E473A315797b0E73a152A",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0xaE5Be9ddb562D34B9E54F5eBbAfD2eF787967C52",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x2310abf1eF6BEB30B74BFf98ac1b326B647F4224",
@@ -521,7 +521,7 @@ export const whitelist = [
     },
     {
         "address": "0x60056e96ed3D5024D6345f5E5163b18ABF19fA87",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x61d8855d78c1463E5bBE33Ac0664417991B26E0D",
@@ -597,7 +597,7 @@ export const whitelist = [
     },
     {
         "address": "0xD8015579d04d3205c8a35244c7cE64B0Bd6DE822",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x4B4DF3B4c0A893C7BeefE72e1b8DAe7654ae6f47",
@@ -605,7 +605,7 @@ export const whitelist = [
     },
     {
         "address": "0x1d9136fa6c577aDBf437dB4e63dc216D331289e6",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x934B510D4C9103E6a87AEf13b816fb080286D649",
@@ -613,7 +613,7 @@ export const whitelist = [
     },
     {
         "address": "0xeF2F9c27483a8fe8790eb928ddF02199e1E2E913",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0xd158e83C452F65D552AeF79fF4478D7C856e7519",
@@ -625,7 +625,7 @@ export const whitelist = [
     },
     {
         "address": "0xEF2b457458617c78C948fCDc9AE4eD58c7F5dB19",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x0F7b88188f2cD8867CC1e1536ac6D8e0E9Fe13C6",
@@ -641,7 +641,7 @@ export const whitelist = [
     },
     {
         "address": "0x78d78538b0378298b96a1a3db12a964e137df5e9",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0xF5c598c5905b1BA9a9442a46b1CFf9C12B9CD725",
@@ -845,7 +845,7 @@ export const whitelist = [
     },
     {
         "address": "0x9731c556A8F285fA33Ff3dec4aDd14784b944036",
-        "amount": 2
+        "amount": 5
     },
     {
         "address": "0x4BCb9aa76d692c8224e481035C186a1fBB68044b",
@@ -853,14 +853,38 @@ export const whitelist = [
     },
     {
         "address": "0xB3506D27B8A3141bB3a33031c1cF6b1069957bf3",
+        "amount": 5
+    },
+    {
+        "address": "0x68989307489066eB57717D46F8059cA94CcB70b1",
         "amount": 2
     },
     {
-        "address": "0x8849AF2Fc730AC16C50914c0D72A0Dc0cD923aDc",
+        "address": "0x166d68F3E759E429d1cCC94d9AEcF12E36757e8C",
         "amount": 2
     },
     {
-        "address": "0x7227f02831D544A68babBd225BF1C55b2a7F05a3",
-        "amount": 10
+        "address": "0x790882DedDc3F4C13a1316d916E89bEBa99739c9",
+        "amount": 2
+    },
+    {
+        "address": "0xb66e39960aA3E1f0e3Ca4A7Fb1214641358e7694",
+        "amount": 2
+    },
+    {
+        "address": "0x2089c079a3cb0f30ef1b8d582d97ee859666c934",
+        "amount": 2
+    },
+    {
+        "address": "0xd60b8c6ffd64404c8862ece6ad3811927680f299",
+        "amount": 2
+    },
+    {
+        "address": "0xe1445eb7dc47462fb4ad093259580e9f95c61de5",
+        "amount": 2
+    },
+    {
+        "address": "0xd158e83C452F65D552AeF79fF4478D7C856e7519",
+        "amount": 5
     }
 ]
