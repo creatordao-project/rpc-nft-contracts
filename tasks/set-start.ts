@@ -4,13 +4,11 @@ import { Wallet, JsonRpcProvider } from "ethers";
 import { getPrivateKey, getProviderRpcUrl } from "../utils/helper";
 import { ReadyPlayerClub, ReadyPlayerClub__factory } from "../typechain-types";
 
-task(`deploy`)
-    .addParam(`name`)
-    .addParam(`symbol`)
-    .addParam(`merkle`) // 6acc26ae7a7eefb1554962f5508a754c50a503e91dbb4c7ea6799baee14bfd53
-    .addOptionalParam(`owner`)
+task(`set-start`)
+    .addParam(`app`)
+    .addParam(`start`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
-        const { name, symbol, merkle, owner } = taskArguments;
+        const { app, start } = taskArguments;
         const privateKey = getPrivateKey();
         const rpcProviderUrl = getProviderRpcUrl(hre.network.name);
 
@@ -18,10 +16,9 @@ task(`deploy`)
         const wallet = new Wallet(privateKey);
         const deployer = wallet.connect(provider);
 
-        const factory: ReadyPlayerClub__factory = await hre.ethers.getContractFactory('ReadyPlayerClub') as ReadyPlayerClub__factory;
-        const contract = await factory.deploy(name, symbol, merkle, owner ?? deployer?.address);
-        await contract.waitForDeployment()
-        const address = await contract.getAddress()
+        const conract = ReadyPlayerClub__factory.connect(app, deployer)
 
-        console.log(`✅ Contract deployed at address ${address} on the ${hre.network.name} blockchain`);
+        const tx = await conract.setMintStartTime(start)
+
+        console.log(`✅ Set start time:`, tx.hash);
     })

@@ -11,21 +11,36 @@ describe("Mint", async function () {
         const leafNodes = [...whitelist, minter].map(user => ethers.keccak256(ethers.solidityPacked(['address', 'uint256'], [user.address, "2"])));
         const merkleTree = new MerkleTree(leafNodes, ethers.keccak256, { sortPairs: true });
         const rootHash = merkleTree.getRoot();
-        const contract = await factory.deploy('test', 'test', rootHash, deployer?.address, deployer?.address);
+        const contract = await factory.deploy('test', 'test', rootHash, deployer?.address);
         await contract.waitForDeployment();
         const deployedAddress = await contract.getAddress();
         const proof = merkleTree.getHexProof(leafNodes[leafNodes.length - 1]);
 
-        const tx = await ReadyPlayerClub__factory.connect(deployedAddress, minter).mint("2", proof);
-        await tx.wait();
-        const tx_receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+        {
+            const tx = await ReadyPlayerClub__factory.connect(deployedAddress, minter).mint("1", "2", proof);
+            await tx.wait();
+            const tx_receipt = await ethers.provider.getTransactionReceipt(tx.hash);
 
-        expect(tx_receipt?.status).to.equal(1);
-        console.log("Gas used:", tx_receipt?.gasUsed)
+            expect(tx_receipt?.status).to.equal(1);
+            console.log("Gas used:", tx_receipt?.gasUsed)
 
-        const tatalSupply = await ReadyPlayerClub__factory.connect(deployedAddress, minter).totalSupply()
-        const balance = await ReadyPlayerClub__factory.connect(deployedAddress, minter).balanceOf(minter.address)
-        console.log('Total Supply:', tatalSupply);
-        console.log('Minter Balance:', balance);
+            const tatalSupply = await ReadyPlayerClub__factory.connect(deployedAddress, minter).totalSupply()
+            const balance = await ReadyPlayerClub__factory.connect(deployedAddress, minter).balanceOf(minter.address)
+            console.log('Total Supply:', tatalSupply);
+            console.log('Minter Balance:', balance);
+        }
+        {
+            const tx = await ReadyPlayerClub__factory.connect(deployedAddress, minter).mint("1", "2", proof);
+            await tx.wait();
+            const tx_receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+
+            expect(tx_receipt?.status).to.equal(1);
+            console.log("Gas used:", tx_receipt?.gasUsed)
+
+            const tatalSupply = await ReadyPlayerClub__factory.connect(deployedAddress, minter).totalSupply()
+            const balance = await ReadyPlayerClub__factory.connect(deployedAddress, minter).balanceOf(minter.address)
+            console.log('Total Supply:', tatalSupply);
+            console.log('Minter Balance:', balance);
+        }
     })
 })

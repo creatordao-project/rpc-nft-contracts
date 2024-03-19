@@ -33,7 +33,7 @@ contract ReadyPlayerClub is ERC721A, Ownable {
     /**
      * @dev prevent duplicate mint
      */
-    mapping(address => bool) public minted;
+    mapping(address => uint256) public minted;
 
     event UpdateBaseURI(string _uri);
     event UpdateWhitelistMerkleTreeRoot(bytes32 _root);
@@ -41,12 +41,13 @@ contract ReadyPlayerClub is ERC721A, Ownable {
     constructor(
         string memory name_,
         string memory symbol_,
-        bytes32 merkleRoot_, 
+        bytes32 merkleRoot_,
         address initialOwner_
     ) ERC721A(name_, symbol_) Ownable(initialOwner_) {
         _whitelistMerkleRoot = merkleRoot_;
         MINT_START_TIME = block.timestamp;
         MINT_END_TIME = block.timestamp + 30 days;
+        _baseUri = "https://dev.readyplayerclub.com/api/rpc-badge/";
     }
 
     /**
@@ -54,6 +55,7 @@ contract ReadyPlayerClub is ERC721A, Ownable {
      * @param merkleProof_ merkle proof
      */
     function mint(
+        uint256 cur_,
         uint256 amount_,
         bytes32[] calldata merkleProof_
     ) public returns (bool) {
@@ -62,14 +64,14 @@ contract ReadyPlayerClub is ERC721A, Ownable {
         if (
             block.timestamp < MINT_START_TIME || MINT_END_TIME < block.timestamp
         ) revert NotMintPeriod();
-        if (minted[_msgSender()] == true) revert AlreadyMinted();
+        if (minted[_msgSender()] + cur_ > amount_) revert AlreadyMinted();
         if (MAX_TOTAL_SUPPLY == totalSupply()) revert AllMinted();
 
-        minted[_msgSender()] = true;
-        if (MAX_TOTAL_SUPPLY <= totalSupply() + amount_) {
+        minted[_msgSender()] += cur_;
+        if (MAX_TOTAL_SUPPLY <= totalSupply() + cur_) {
             _mint(_msgSender(), MAX_TOTAL_SUPPLY - totalSupply());
         } else {
-            _mint(_msgSender(), amount_);
+            _mint(_msgSender(), cur_);
         }
 
         return true;
