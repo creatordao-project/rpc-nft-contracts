@@ -5,8 +5,8 @@ import { getPrivateKey, getProviderRpcUrl } from "../utils/helper";
 import { ReadyPlayerClub, ReadyPlayerClub__factory } from "../typechain-types";
 
 task(`set-start`)
-    .addParam(`app`)
-    .addParam(`start`)
+    .addParam(`app`, `NFT contract address`)
+    .addParam(`start`, `Mint start time`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
         const { app, start } = taskArguments;
         const privateKey = getPrivateKey();

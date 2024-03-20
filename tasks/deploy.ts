@@ -5,10 +5,10 @@ import { getPrivateKey, getProviderRpcUrl } from "../utils/helper";
 import { ReadyPlayerClub, ReadyPlayerClub__factory } from "../typechain-types";
 
 task(`deploy`)
-    .addParam(`name`)
-    .addParam(`symbol`)
-    .addParam(`merkle`) // 0xaa77cc0d1cd1f82db420ca17686e4dd7b8642b16a09ceb674c029fe07764631d - 通过 npx hardhat root 可以计算whitelist的root
-    .addOptionalParam(`owner`)
+    .addParam(`name`, `ERC-721 Token name`)
+    .addParam(`symbol`, `ERC-721 Token symbol`)
+    .addParam(`merkle`, `Whitelist merkle root`) // 0xaa77cc0d1cd1f82db420ca17686e4dd7b8642b16a09ceb674c029fe07764631d - 通过 npx hardhat root 可以计算whitelist的root
+    .addOptionalParam(`owner`, `Contract owner`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
         const { name, symbol, merkle, owner } = taskArguments;
         const privateKey = getPrivateKey();

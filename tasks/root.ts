@@ -4,6 +4,8 @@ import { keccak256, solidityPacked } from "ethers";
 import MerkleTree from "merkletreejs";
 import { whitelist } from "../utils/constant/whitelist";
 
+// You can edit /utils/constant/whitelist.ts to update Whitelist
+
 task(`root`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
         const tree = new MerkleTree(

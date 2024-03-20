@@ -4,11 +4,11 @@ import { Wallet, JsonRpcProvider } from "ethers";
 import { getPrivateKey, getProviderRpcUrl } from "../utils/helper";
 import { ReadyPlayerClub, ReadyPlayerClub__factory } from "../typechain-types";
 
-task(`set-merkle`)
+task(`set-end`)
     .addParam(`app`, `NFT contract address`)
-    .addParam(`merkle`, `Whitelist merkle root`)
+    .addParam(`end`, `Mint end time`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
-        const { app, merkle } = taskArguments;
+        const { app, end } = taskArguments;
         const privateKey = getPrivateKey();
         const rpcProviderUrl = getProviderRpcUrl(hre.network.name);
 
@@ -17,9 +17,8 @@ task(`set-merkle`)
         const deployer = wallet.connect(provider);
 
         const conract = ReadyPlayerClub__factory.connect(app, deployer)
-        console.log(`Start transaction...`);
 
-        const tx = await conract.updateWhitelisteMerkleTree(merkle)
+        const tx = await conract.setMintEndTime(end)
 
-        console.log(`✅ Set merkle tree:`, tx.hash);
+        console.log(`✅ Set end time:`, tx.hash);
     })

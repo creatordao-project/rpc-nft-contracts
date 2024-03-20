@@ -1,9 +1,9 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const name = 'RPC'
-  const symbol = 'RPC'
-  const merkle = '0x6fd738c93c0ced55e88054568796cac6f386405088c183cb9c863a338b6fdddd'
+  const name = 'ReadyPlayerClub'
+  const symbol = 'ReadyPlayerClub'
+  const merkle = '0xaa77cc0d1cd1f82db420ca17686e4dd7b8642b16a09ceb674c029fe07764631d'
   const owner = '0x8849AF2Fc730AC16C50914c0D72A0Dc0cD923aDc'
 
   const contract = await ethers.deployContract("ReadyPlayerClub", [name, symbol, merkle, owner]);
