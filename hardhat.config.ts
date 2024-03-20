@@ -5,6 +5,7 @@ import "./tasks"
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const ETHEREUM_SEPOLIA_RPC_URL = process.env.ETHEREUM_SEPOLIA_RPC_URL;
+const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -19,6 +20,11 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       chainId: 1337
+    },
+    ethereum: {
+      url: ETHEREUM_RPC_URL !== undefined ? ETHEREUM_RPC_URL : '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      chainId: 1
     },
     ethereumSepolia: {
       url: ETHEREUM_SEPOLIA_RPC_URL !== undefined ? ETHEREUM_SEPOLIA_RPC_URL : '',
