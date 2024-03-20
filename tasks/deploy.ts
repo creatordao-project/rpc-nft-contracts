@@ -7,7 +7,7 @@ import { ReadyPlayerClub, ReadyPlayerClub__factory } from "../typechain-types";
 task(`deploy`)
     .addParam(`name`)
     .addParam(`symbol`)
-    .addParam(`merkle`) // 6acc26ae7a7eefb1554962f5508a754c50a503e91dbb4c7ea6799baee14bfd53
+    .addParam(`merkle`) // 0xaa77cc0d1cd1f82db420ca17686e4dd7b8642b16a09ceb674c029fe07764631d - 通过 npx hardhat root 可以计算whitelist的root
     .addOptionalParam(`owner`)
     .setAction(async (taskArguments: TaskArguments, hre: HardhatRuntimeEnvironment) => {
         const { name, symbol, merkle, owner } = taskArguments;
